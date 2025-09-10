@@ -1,46 +1,83 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class CarController : MonoBehaviour
 {
     [Header("Movement")]
     public float forwardSpeed = 10f;
-    public float jumpForce = 8f;
-    // We'll add a boost speed for later
     public float boostSpeed = 25f;
+
+    [Header("Jump Settings")]
+    public float jumpForce = 8f;
+    public int maxJumps = 2;
+    private int jumpsLeft;
+
+    [Header("Ground Check")]
+    public LayerMask groundLayer;
+    public Transform[] groundCheckPoints;
+    public float groundCheckDistance = 0.2f;
+
+    [Header("Boost Settings")]
+    public float boostDuration = 0.5f;
+    public float boostCooldown = 2f;
 
     private Rigidbody rb;
     private bool isGrounded;
-
-    // We'll use this to track if we are currently boosting
     private bool isBoosting = false;
+    private bool canBoost = true;
+    private bool jumpRequested = false;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        jumpsLeft = maxJumps;
     }
 
     void Update()
     {
-        // --- Core Movement ---
-        float currentSpeed = isBoosting ? boostSpeed : forwardSpeed;
-        transform.position += Vector3.forward * currentSpeed * Time.deltaTime;
-
-        // --- Input Handling ---
         HandleKeyboardInput();
-
-        // Call the new, combined input function
         HandlePointerInput();
+    }
+
+    void FixedUpdate()
+    {
+        CheckGrounded();
+
+        if (jumpRequested)
+        {
+            Jump();
+            jumpRequested = false;
+        }
+
+        float currentSpeed = isBoosting ? boostSpeed : forwardSpeed;
+        Vector3 movement = transform.forward * currentSpeed * Time.fixedDeltaTime;
+        rb.MovePosition(rb.position + movement);
+    }
+
+    private void CheckGrounded()
+    {
+        foreach (Transform point in groundCheckPoints)
+        {
+            if (Physics.Raycast(point.position, Vector3.down, groundCheckDistance, groundLayer))
+            {
+                if (!isGrounded)
+                {
+                    jumpsLeft = maxJumps;
+                }
+                isGrounded = true;
+                return;
+            }
+        }
+        isGrounded = false;
     }
 
     void HandleKeyboardInput()
     {
-        // Check for jump input
-        if (isGrounded && Input.GetKeyDown(KeyCode.Space))
+        if (jumpsLeft > 0 && Input.GetKeyDown(KeyCode.Space))
         {
-            Jump();
+            jumpRequested = true;
         }
-
-        // Use Left Shift for boost testing in the editor
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
             Boost();
@@ -49,75 +86,35 @@ public class CarController : MonoBehaviour
 
     void HandlePointerInput()
     {
-        // This code will only run when on a mobile device (iOS or Android)
-#if UNITY_IOS || UNITY_ANDROID
-        if (Input.touchCount > 0)
-        {
-            Touch touch = Input.GetTouch(0);
-            if (touch.phase == TouchPhase.Began)
-            {
-                // Check if the touch is on the left side of the screen
-                if (touch.position.x < Screen.width / 2)
-                {
-                    if (isGrounded) Jump();
-                }
-                // Check if the touch is on the right side of the screen
-                else if (touch.position.x >= Screen.width / 2)
-                {
-                    Boost();
-                }
-            }
-        }
-#endif
-
-        // This code will only run when in the Unity Editor
 #if UNITY_EDITOR
-        if (Input.GetMouseButtonDown(0)) // 0 is the left mouse button
+        if (Input.GetMouseButtonDown(0))
         {
-            // Check if the mouse click is on the left side of the screen
-            if (Input.mousePosition.x < Screen.width / 2)
-            {
-                if (isGrounded) Jump();
-            }
-            // Check if the mouse click is on the right side of the screen
-            else if (Input.mousePosition.x >= Screen.width / 2)
-            {
-                Boost();
-            }
+            if (Input.mousePosition.x < Screen.width / 2) { if (jumpsLeft > 0) jumpRequested = true; }
+            else if (Input.mousePosition.x >= Screen.width / 2) { Boost(); }
         }
 #endif
     }
 
     void Jump()
     {
-        // The jump logic is now in its own function
-        isGrounded = false;
+        rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
         rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-        Debug.Log("Jump!");
+        jumpsLeft--;
     }
 
-    void Boost()
-    {
-        // For now, our boost will just be a debug message.
-        // We will add the actual logic (like a speed burst and effects) in a later step.
-        Debug.Log("Boost!");
-        // We'll add a simple timed boost later. For now, we can just log it.
-        // isBoosting = true; 
-        // Invoke("StopBoosting", 0.5f); // Example of how we might stop it
-    }
+    void Boost() { if (canBoost) StartCoroutine(BoostCoroutine()); }
 
-    /*
-    void StopBoosting()
+    IEnumerator BoostCoroutine()
     {
+        canBoost = false; isBoosting = true;
+        yield return new WaitForSeconds(boostDuration);
         isBoosting = false;
+        yield return new WaitForSeconds(boostCooldown);
+        canBoost = true;
     }
-    */
 
-    void OnCollisionEnter(Collision collision)
+    void OnTriggerEnter(Collider other)
     {
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            isGrounded = true;
-        }
+        if (other.CompareTag("DeathZone")) { SceneManager.LoadScene(SceneManager.GetActiveScene().name); }
     }
 }
