@@ -282,10 +282,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 548076421}
-  cubePrefabs:
+  platformPrefabs:
   - {fileID: 1284567279651289365, guid: fdc843b27263bd24bb1747f1d75e198c, type: 3}
-  minPlatformLength: 5
-  maxPlatformLength: 15
+  - {fileID: 7257214427868829211, guid: 54631bc94bfd10445be3929f070eaf4d, type: 3}
+  minYPosition: 0
+  maxYPosition: 5
+  maxHeighChange: 3
   minGapLength: 10
   maxGapLength: 15
   initialPlatformCount: 3
