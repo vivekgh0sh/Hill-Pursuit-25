@@ -6,39 +6,41 @@ public class LevelGenerator : MonoBehaviour
 {
     [Header("References")]
     public Transform player;
-    // We now use an array of cube prefabs for variety
-    public GameObject[] cubePrefabs;
+    // This array will now hold your complete platform prefabs of different shapes
+    public GameObject[] platformPrefabs;
 
-    [Header("Platform Settings")]
-    [Range(3, 20)]
-    public int minPlatformLength = 5; // Min number of cubes in a platform
-    [Range(5, 30)]
-    public int maxPlatformLength = 15; // Max number of cubes
+    [Header("Platform Placement")]
+    public float minYPosition = 0f;
+    public float maxYPosition = 5f;
+    public float maxHeighChange = 3f; // Max jump height between consecutive platforms
 
     [Header("Gap Settings")]
-    [Range(1, 10)]
-    public int minGapLength = 2; // Min empty space between platforms
-    [Range(3, 15)]
-    public int maxGapLength = 8; // Max empty space
+    [Range(2, 10)]
+    public float minGapLength = 3;
+    [Range(5, 15)]
+    public float maxGapLength = 10;
 
     [Header("Generation Control")]
-    public int initialPlatformCount = 3; // Number of platforms to spawn at the start
-    public int generationLookahead = 40; // How far ahead of the player to spawn new platforms
+    public int initialPlatformCount = 5;
+    public int generationLookahead = 50;
 
-    // We still need to track spawned objects for cleanup
-    private List<GameObject> spawnedCubes = new List<GameObject>();
+    private List<GameObject> spawnedPlatforms = new List<GameObject>();
     private Vector3 nextSpawnPoint = Vector3.zero;
+    private float lastPlatformY = 0f;
     private float lastCleanupZ = 0f;
 
     void Start()
     {
-        if (cubePrefabs.Length == 0)
+        if (platformPrefabs.Length == 0)
         {
-            Debug.LogError("No cube prefabs assigned in the LevelGenerator!");
+            Debug.LogError("No platform prefabs assigned in the LevelGenerator!");
             return;
         }
 
-        // Spawn the initial runway for the player
+        // Set the initial Y position
+        lastPlatformY = nextSpawnPoint.y;
+
+        // Spawn the starting platforms
         for (int i = 0; i < initialPlatformCount; i++)
         {
             GenerateSegment();
@@ -47,63 +49,65 @@ public class LevelGenerator : MonoBehaviour
 
     void Update()
     {
-        // Check if the player has moved far enough to trigger new generation
         if (player.position.z > nextSpawnPoint.z - generationLookahead)
         {
             GenerateSegment();
         }
 
-        // Clean up cubes that are far behind the player
-        // We do this less frequently than every frame for performance
-        if (player.position.z - lastCleanupZ > 20f)
+        if (player.position.z - lastCleanupZ > 30f)
         {
-            CleanUpCubes();
+            CleanUpPlatforms();
             lastCleanupZ = player.position.z;
         }
     }
 
     void GenerateSegment()
     {
-        // 1. Decide on the length of the next solid platform
-        int platformLength = Random.Range(minPlatformLength, maxPlatformLength);
+        // 1. Pick a random platform prefab from our array
+        GameObject prefabToSpawn = platformPrefabs[Random.Range(0, platformPrefabs.Length)];
 
-        // 2. Build the platform by spawning cubes one by one
-        for (int i = 0; i < platformLength; i++)
-        {
-            // Pick a random cube prefab from our array for visual variety
-            GameObject prefabToSpawn = cubePrefabs[Random.Range(0, cubePrefabs.Length)];
+        // Get the length of the chosen prefab from its collider bounds. This is KEY.
+        float platformLength = prefabToSpawn.GetComponent<Collider>().bounds.size.z;
 
-            // Instantiate the cube and add it to our list for cleanup
-            GameObject newCube = Instantiate(prefabToSpawn, nextSpawnPoint, Quaternion.identity);
-            spawnedCubes.Add(newCube);
+        // 2. Calculate a new Y position for this platform
+        float randomYOffset = Random.Range(-maxHeighChange, maxHeighChange);
+        float newY = Mathf.Clamp(lastPlatformY + randomYOffset, minYPosition, maxYPosition);
 
-            // Move the spawn point forward for the next cube
-            nextSpawnPoint.z += 1; // Assumes cubes are 1 unit long
-        }
+        // 3. Calculate the actual spawn position.
+        // We add half the platform's length because its pivot is in the center.
+        Vector3 spawnPosition = new Vector3(
+            nextSpawnPoint.x,
+            newY,
+            nextSpawnPoint.z + (platformLength / 2)
+        );
 
-        // 3. Decide on the length of the gap after the platform
-        int gapLength = Random.Range(minGapLength, maxGapLength);
+        // 4. Instantiate the platform and add it to our list
+        GameObject newPlatform = Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity);
+        spawnedPlatforms.Add(newPlatform);
 
-        // 4. Move the spawn point forward to create the empty space
-        nextSpawnPoint.z += gapLength;
+        // 5. Update variables for the next segment
+        lastPlatformY = newY; // Remember the height of this platform
+        float gapLength = Random.Range(minGapLength, maxGapLength);
+
+        // The next spawn point is at the end of this platform, plus the gap
+        nextSpawnPoint.z += platformLength + gapLength;
     }
 
-    void CleanUpCubes()
+    void CleanUpPlatforms()
     {
-        // Use a for loop backwards because we are removing items from the list
-        for (int i = spawnedCubes.Count - 1; i >= 0; i--)
+        for (int i = spawnedPlatforms.Count - 1; i >= 0; i--)
         {
-            if (spawnedCubes[i] == null)
+            if (spawnedPlatforms[i] == null)
             {
-                spawnedCubes.RemoveAt(i);
+                spawnedPlatforms.RemoveAt(i);
                 continue;
             }
 
-            if (player.position.z - spawnedCubes[i].transform.position.z > 50f)
+            if (player.position.z - spawnedPlatforms[i].transform.position.z > 100f) // Increased cleanup distance
             {
-                GameObject cubeToDestroy = spawnedCubes[i];
-                spawnedCubes.RemoveAt(i);
-                Destroy(cubeToDestroy);
+                GameObject platformToDestroy = spawnedPlatforms[i];
+                spawnedPlatforms.RemoveAt(i);
+                Destroy(platformToDestroy);
             }
         }
     }
