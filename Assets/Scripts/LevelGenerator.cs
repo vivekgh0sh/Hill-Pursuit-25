@@ -1,113 +1,91 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class LevelGenerator : MonoBehaviour
 {
     [Header("References")]
     public Transform player;
-    // This array will now hold your complete platform prefabs of different shapes
-    public GameObject[] platformPrefabs;
-
-    [Header("Platform Placement")]
-    public float minYPosition = 0f;
-    public float maxYPosition = 5f;
-    public float maxHeighChange = 3f; // Max jump height between consecutive platforms
-
-    [Header("Gap Settings")]
-    [Range(2, 10)]
-    public float minGapLength = 3;
-    [Range(5, 15)]
-    public float maxGapLength = 10;
+    public GameObject[] levelChunkPrefabs;
 
     [Header("Generation Control")]
-    public int initialPlatformCount = 5;
-    public int generationLookahead = 50;
+    public int initialChunkCount = 3;
+    
+    // --- THIS IS THE CORRECTED LINE ---
+    public float generationLookahead = 100f; // Changed from int to float
+    
+    public float cleanupDistance = 200f;
 
-    private List<GameObject> spawnedPlatforms = new List<GameObject>();
-    private Vector3 nextSpawnPoint = Vector3.zero;
-    private float lastPlatformY = 0f;
-    private float lastCleanupZ = 0f;
+    private List<GameObject> spawnedChunks = new List<GameObject>();
+    private Vector3 lastEndPoint;
 
     void Start()
     {
-        if (platformPrefabs.Length == 0)
+        if (levelChunkPrefabs == null || levelChunkPrefabs.Length == 0)
         {
-            Debug.LogError("No platform prefabs assigned in the LevelGenerator!");
+            Debug.LogError("Level Chunk Prefabs array is not assigned or is empty!");
             return;
         }
 
-        // Set the initial Y position
-        lastPlatformY = nextSpawnPoint.y;
+        // Use the first chunk in the array as the starting one.
+        GameObject firstChunk = Instantiate(levelChunkPrefabs[0], Vector3.zero, Quaternion.identity, this.transform);
+        spawnedChunks.Add(firstChunk);
+        
+        PlatformData firstData = firstChunk.GetComponent<PlatformData>();
+        lastEndPoint = firstData.endPoint.position;
 
-        // Spawn the starting platforms
-        for (int i = 0; i < initialPlatformCount; i++)
+        // Place the player at the start of that chunk.
+        player.position = firstData.startPoint.position + Vector3.up * 2f;
+        player.rotation = Quaternion.identity;
+
+        for (int i = 0; i < initialChunkCount - 1; i++)
         {
-            GenerateSegment();
+            GenerateChunk();
         }
     }
 
     void Update()
     {
-        if (player.position.z > nextSpawnPoint.z - generationLookahead)
+        if (player.position.z > lastEndPoint.z - generationLookahead)
         {
-            GenerateSegment();
+            GenerateChunk();
         }
-
-        if (player.position.z - lastCleanupZ > 30f)
-        {
-            CleanUpPlatforms();
-            lastCleanupZ = player.position.z;
-        }
+        CleanUpChunks();
     }
 
-    void GenerateSegment()
+    void GenerateChunk()
     {
-        // 1. Pick a random platform prefab from our array
-        GameObject prefabToSpawn = platformPrefabs[Random.Range(0, platformPrefabs.Length)];
+        GameObject prefabToSpawn = levelChunkPrefabs[Random.Range(0, levelChunkPrefabs.Length)];
+        GameObject newChunk = Instantiate(prefabToSpawn, Vector3.zero, Quaternion.identity, this.transform);
 
-        // Get the length of the chosen prefab from its collider bounds. This is KEY.
-        float platformLength = prefabToSpawn.GetComponent<Collider>().bounds.size.z;
-
-        // 2. Calculate a new Y position for this platform
-        float randomYOffset = Random.Range(-maxHeighChange, maxHeighChange);
-        float newY = Mathf.Clamp(lastPlatformY + randomYOffset, minYPosition, maxYPosition);
-
-        // 3. Calculate the actual spawn position.
-        // We add half the platform's length because its pivot is in the center.
-        Vector3 spawnPosition = new Vector3(
-            nextSpawnPoint.x,
-            newY,
-            nextSpawnPoint.z + (platformLength / 2)
-        );
-
-        // 4. Instantiate the platform and add it to our list
-        GameObject newPlatform = Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity);
-        spawnedPlatforms.Add(newPlatform);
-
-        // 5. Update variables for the next segment
-        lastPlatformY = newY; // Remember the height of this platform
-        float gapLength = Random.Range(minGapLength, maxGapLength);
-
-        // The next spawn point is at the end of this platform, plus the gap
-        nextSpawnPoint.z += platformLength + gapLength;
+        PlatformData data = newChunk.GetComponent<PlatformData>();
+        Vector3 startPoint = data.startPoint.position;
+        Vector3 endPoint = data.endPoint.position;
+        
+        Vector3 moveVector = lastEndPoint - startPoint;
+        
+        newChunk.transform.position += moveVector;
+        
+        lastEndPoint = endPoint + moveVector;
+        
+        spawnedChunks.Add(newChunk);
     }
 
-    void CleanUpPlatforms()
+    void CleanUpChunks()
     {
-        for (int i = spawnedPlatforms.Count - 1; i >= 0; i--)
+        for (int i = spawnedChunks.Count - 1; i >= 0; i--)
         {
-            if (spawnedPlatforms[i] == null)
+            if (spawnedChunks[i] == null)
             {
-                spawnedPlatforms.RemoveAt(i);
+                spawnedChunks.RemoveAt(i);
                 continue;
             }
 
-            if (player.position.z - spawnedPlatforms[i].transform.position.z > 100f) // Increased cleanup distance
+            // Use the chunk's root position for a simpler check
+            float chunkPositionZ = spawnedChunks[i].transform.position.z;
+            if (player.position.z - chunkPositionZ > cleanupDistance)
             {
-                GameObject platformToDestroy = spawnedPlatforms[i];
-                spawnedPlatforms.RemoveAt(i);
-                Destroy(platformToDestroy);
+                Destroy(spawnedChunks[i]);
+                spawnedChunks.RemoveAt(i);
             }
         }
     }

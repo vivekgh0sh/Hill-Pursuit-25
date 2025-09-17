@@ -3,42 +3,35 @@ using UnityEngine;
 public class BackgroundFollow : MonoBehaviour
 {
     [Header("Target")]
-    public Transform playerTransform; // Assign your player's transform here
+    public Transform cameraTransform; // Assign your Main Camera's transform
 
-    private float initialZOffset;
-    private float initialXPosition;
-    private float initialYPosition;
+    // We will store the camera's position from the previous frame
+    private Vector3 lastCameraPosition;
 
     void Start()
     {
-        if (playerTransform == null)
+        if (cameraTransform == null)
         {
-            Debug.LogError("Player Transform is not assigned in BackgroundFollow script!");
+            Debug.LogError("Camera Transform is not assigned in BackgroundFollow script!");
             return;
         }
 
-        // Store our starting position
-        initialXPosition = transform.position.x;
-        initialYPosition = transform.position.y;
-
-        // Calculate and store the initial distance between the background and the player on the Z-axis
-        initialZOffset = transform.position.z - playerTransform.position.z;
+        // At the start, store the camera's initial position.
+        lastCameraPosition = cameraTransform.position;
     }
 
-    // Use LateUpdate to ensure the player has finished moving for the frame
     void LateUpdate()
     {
-        if (playerTransform == null) return;
+        if (cameraTransform == null) return;
 
-        // Create the new position for the background container.
-        // We use our stored initial X and Y to prevent any vertical or sideways movement.
-        // We update the Z position based on the player's current Z plus our initial offset.
-        Vector3 newPosition = new Vector3(
-            initialXPosition,
-            initialYPosition,
-            playerTransform.position.z + initialZOffset
-        );
+        // 1. Calculate how much the camera has moved since the last frame.
+        Vector3 deltaMovement = cameraTransform.position - lastCameraPosition;
 
-        transform.position = newPosition;
+        // 2. Apply that exact same movement to our background container.
+        // This preserves the initial offset you created in the editor.
+        transform.position += deltaMovement;
+
+        // 3. Update the last camera position for the next frame's calculation.
+        lastCameraPosition = cameraTransform.position;
     }
 }
