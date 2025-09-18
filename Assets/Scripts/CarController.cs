@@ -225,4 +225,17 @@ public class CarController : MonoBehaviour
             }
         }
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        // Check if the object we hit has the "Coin" tag
+        if (other.gameObject.CompareTag("Coin"))
+        {
+            // Tell the GameManager that we collected a coin
+            GameManager.instance.AddCoin();
+
+            // Destroy the coin object
+            Destroy(other.gameObject);
+        }
+    }
 }
