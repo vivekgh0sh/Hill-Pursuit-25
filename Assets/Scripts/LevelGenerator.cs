@@ -10,8 +10,7 @@ public class LevelGenerator : MonoBehaviour
     [Header("Generation Control")]
     public int initialChunkCount = 3;
     
-    // --- THIS IS THE CORRECTED LINE ---
-    public float generationLookahead = 100f; // Changed from int to float
+    public float generationLookahead = 100f;
     
     public float cleanupDistance = 200f;
 
@@ -80,7 +79,6 @@ public class LevelGenerator : MonoBehaviour
                 continue;
             }
 
-            // Use the chunk's root position for a simpler check
             float chunkPositionZ = spawnedChunks[i].transform.position.z;
             if (player.position.z - chunkPositionZ > cleanupDistance)
             {
