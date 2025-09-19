@@ -1,83 +1,121 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using TMPro;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
-    [Header("Game State")]
-    public bool isGameOver = false;
+    public static GameManager Instance { get; private set; }
 
-    [Header("Player and Score")]
-    public Transform player;
-    private int coinsCollected = 0;
+    public enum GameState { MainMenu, Playing, GameOver }
+    public GameState currentState;
+
+    [Header("Player Score")]
+    public Transform playerTransform;
+    private int coinsCollectedThisRun = 0;
     private float distanceTraveled = 0f;
-    private float startingZPosition; // This will store our starting point
+    private float startingZPosition;
 
-    [Header("UI References")]
-    public GameObject gameOverPanel;
-    public TextMeshProUGUI distanceText;
-    public TextMeshProUGUI coinText;
-
-    public static GameManager instance;
+    [Header("Saved Data")]
+    public int totalCoins = 0;
+    public int highscore = 0;
+    public List<CarData> allCars;
+    public int selectedCarIndex = 0;
 
     void Awake()
     {
-        if (instance == null) { instance = this; }
-        else { Destroy(gameObject); }
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+            LoadGameData();
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
-    void Start()
+    void OnEnable() { SceneManager.sceneLoaded += OnSceneLoaded; }
+    void OnDisable() { SceneManager.sceneLoaded -= OnSceneLoaded; }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        isGameOver = false;
-        if (gameOverPanel != null) { gameOverPanel.SetActive(false); }
-        Time.timeScale = 1f;
-
-        coinsCollected = 0;
-
-        // Record where the player starts
-        if (player != null)
+        if (scene.name == "SampleScene")
         {
-            startingZPosition = player.position.z;
+            currentState = GameState.Playing;
+            Time.timeScale = 1f;
+            coinsCollectedThisRun = 0;
+            distanceTraveled = 0f;
         }
-
-        UpdateUI();
+        else
+        {
+            currentState = GameState.MainMenu;
+        }
     }
 
     void Update()
     {
-        if (!isGameOver && player != null)
+        if (currentState == GameState.Playing && playerTransform != null)
         {
-            // Calculate distance relative to the starting point
-            distanceTraveled = player.position.z - startingZPosition;
-            UpdateUI();
+            distanceTraveled = playerTransform.position.z - startingZPosition;
         }
     }
 
-    public void AddCoin()
+    public void RegisterPlayer(Transform player)
     {
-        if (isGameOver) return;
-        coinsCollected++;
-        UpdateUI();
+        playerTransform = player;
+        startingZPosition = player.position.z;
     }
 
-    private void UpdateUI()
+    public void CollectCoin()
     {
-        // Use Mathf.Max to ensure the distance never shows a negative number (e.g., due to floating point quirks)
-        if (distanceText != null) { distanceText.text = Mathf.Max(0, distanceTraveled).ToString("F0"); }
-        if (coinText != null) { coinText.text = "Coins: " + coinsCollected; }
+        if (currentState != GameState.Playing) return;
+        coinsCollectedThisRun++;
     }
 
-    public void GameOver()
+    public int GetCurrentDistance() { return Mathf.Max(0, Mathf.FloorToInt(distanceTraveled)); }
+    public int GetRunCoins() { return coinsCollectedThisRun; }
+
+    public void EndGame()
     {
-        if (isGameOver) return;
-        isGameOver = true;
-        if (gameOverPanel != null) { gameOverPanel.SetActive(true); }
+        if (currentState != GameState.Playing) return;
+        currentState = GameState.GameOver;
         Time.timeScale = 0f;
+        int finalDistance = GetCurrentDistance();
+        if (finalDistance > highscore) { highscore = finalDistance; }
+        totalCoins += coinsCollectedThisRun;
+        SaveGameData();
+        GameplayUIController uiController = FindObjectOfType<GameplayUIController>();
+        if (uiController != null) { uiController.ShowGameOverScreen(); }
     }
 
-    public void RestartGame()
+    public void GoToMenu() { Time.timeScale = 1f; SceneManager.LoadScene("VehicleSelectionUI"); }
+    public void StartEndlessMode() { Time.timeScale = 1f; SceneManager.LoadScene("SampleScene"); }
+
+    // --- NEW METHODS FOR THE SHOWROOM ---
+    public bool CanAfford(int cost) { return totalCoins >= cost; }
+    public void SpendCoins(int amount) { totalCoins -= amount; }
+    public void UnlockCar(string carID) { PlayerPrefs.SetInt("CarUnlocked_" + carID, 1); }
+    public bool IsCarUnlocked(string carID)
     {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        CarData car = allCars.Find(c => c.carID == carID);
+        if (car != null && car.unlockCost == 0) return true; // Cars that cost 0 are unlocked by default
+        return PlayerPrefs.GetInt("CarUnlocked_" + carID, 0) == 1;
+    }
+    // --- END OF NEW METHODS ---
+
+    public void SaveGameData()
+    {
+        PlayerPrefs.SetInt("TotalCoins", totalCoins);
+        PlayerPrefs.SetInt("Highscore", highscore);
+        PlayerPrefs.SetInt("SelectedCarIndex", selectedCarIndex);
+        PlayerPrefs.Save();
+    }
+
+    public void LoadGameData()
+    {
+        totalCoins = PlayerPrefs.GetInt("TotalCoins", 0);
+        highscore = PlayerPrefs.GetInt("Highscore", 0);
+        selectedCarIndex = PlayerPrefs.GetInt("SelectedCarIndex", 0);
     }
 }

@@ -54,7 +54,8 @@ public class CarController : MonoBehaviour
     {
         if (transform.position.y < lastGroundedY - deathDistance)
         {
-            GameManager.instance.GameOver();
+            // CORRECTED: Uses 'Instance' and the 'EndGame' method
+            GameManager.Instance.EndGame();
             return;
         }
 
@@ -97,18 +98,9 @@ public class CarController : MonoBehaviour
 
     void HandleKeyboardInput()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            RequestJump();
-        }
-        if (Input.GetKeyUp(KeyCode.Space))
-        {
-            EndJump();
-        }
-        if (Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            Boost();
-        }
+        if (Input.GetKeyDown(KeyCode.Space)) { RequestJump(); }
+        if (Input.GetKeyUp(KeyCode.Space)) { EndJump(); }
+        if (Input.GetKeyDown(KeyCode.LeftShift)) { Boost(); }
     }
 
     void HandlePointerInput()
@@ -118,30 +110,20 @@ public class CarController : MonoBehaviour
         {
             if (touch.position.x < Screen.width / 2)
             {
-                if (touch.phase == TouchPhase.Began)
-                {
-                    RequestJump();
-                }
-                if (touch.phase == TouchPhase.Ended)
-                {
-                    EndJump();
-                }
+                if (touch.phase == TouchPhase.Began) { RequestJump(); }
+                if (touch.phase == TouchPhase.Ended) { EndJump(); }
             }
             else
             {
-                if (touch.phase == TouchPhase.Began)
-                {
-                    Boost();
-                }
+                if (touch.phase == TouchPhase.Began) { Boost(); }
             }
         }
 #endif
-
 #if UNITY_EDITOR
         if (Input.GetMouseButtonDown(0))
         {
             if (Input.mousePosition.x < Screen.width / 2) { RequestJump(); }
-            else if (Input.mousePosition.x >= Screen.width / 2) { Boost(); }
+            else { Boost(); }
         }
         if (Input.GetMouseButtonUp(0))
         {
@@ -150,65 +132,17 @@ public class CarController : MonoBehaviour
 #endif
     }
 
-    private void RequestJump()
-    {
-        if (jumpsLeft > 0 && !isJumpOnCooldown)
-        {
-            jumpRequested = true;
-        }
-    }
-
-    private void EndJump()
-    {
-        if (isJumping && rb.linearVelocity.y > 0)
-        {
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, rb.linearVelocity.y * jumpHoldCutoff, rb.linearVelocity.z);
-        }
-        isJumping = false;
-    }
-
-    void Jump()
-    {
-        rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
-        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-
-        jumpsLeft--;
-        isJumping = true;
-
-        if (jumpsLeft == 0)
-        {
-            StartCoroutine(JumpCooldownCoroutine());
-        }
-    }
-
-    IEnumerator JumpCooldownCoroutine()
-    {
-        isJumpOnCooldown = true;
-        yield return new WaitForSeconds(jumpCooldown);
-        isJumpOnCooldown = false;
-    }
-
-    void Boost()
-    {
-        if (canBoost)
-        {
-            StartCoroutine(BoostCoroutine());
-        }
-    }
-
-    IEnumerator BoostCoroutine()
-    {
-        canBoost = false;
-        isBoosting = true;
-        yield return new WaitForSeconds(boostDuration);
-        isBoosting = false;
-        yield return new WaitForSeconds(boostCooldown);
-        canBoost = true;
-    }
+    private void RequestJump() { if (jumpsLeft > 0 && !isJumpOnCooldown) { jumpRequested = true; } }
+    private void EndJump() { if (isJumping && rb.linearVelocity.y > 0) { rb.linearVelocity = new Vector3(rb.linearVelocity.x, rb.linearVelocity.y * jumpHoldCutoff, rb.linearVelocity.z); } isJumping = false; }
+    void Jump() { rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z); rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse); jumpsLeft--; isJumping = true; if (jumpsLeft == 0) { StartCoroutine(JumpCooldownCoroutine()); } }
+    IEnumerator JumpCooldownCoroutine() { isJumpOnCooldown = true; yield return new WaitForSeconds(jumpCooldown); isJumpOnCooldown = false; }
+    void Boost() { if (canBoost) { StartCoroutine(BoostCoroutine()); } }
+    IEnumerator BoostCoroutine() { canBoost = false; isBoosting = true; yield return new WaitForSeconds(boostDuration); isBoosting = false; yield return new WaitForSeconds(boostCooldown); canBoost = true; }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (GameManager.instance.isGameOver)
+        // CORRECTED: Uses 'Instance' and checks the 'currentState'
+        if (GameManager.Instance.currentState == GameManager.GameState.GameOver)
         {
             return;
         }
@@ -220,7 +154,8 @@ public class CarController : MonoBehaviour
 
             if (yNormal < 0.5f)
             {
-                GameManager.instance.GameOver();
+                // CORRECTED: Uses 'Instance' and the 'EndGame' method
+                GameManager.Instance.EndGame();
                 rb.isKinematic = true;
             }
         }
@@ -228,14 +163,16 @@ public class CarController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // Check if the object we hit has the "Coin" tag
         if (other.gameObject.CompareTag("Coin"))
         {
-            // Tell the GameManager that we collected a coin
-            GameManager.instance.AddCoin();
-
-            // Destroy the coin object
+            // CORRECTED: Uses 'Instance' and the 'CollectCoin' method
+            GameManager.Instance.CollectCoin();
             Destroy(other.gameObject);
         }
+    }
+
+    public bool IsGrounded()
+    {
+        return isGrounded;
     }
 }
