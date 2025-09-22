@@ -14,6 +14,7 @@ public class VehicleSelectionManager : MonoBehaviour
     public Button rightButton;
     public Button unlockButton;
     public Button startButton;
+    public Button stageButton;
     public TextMeshProUGUI totalCoinsText;
     public TextMeshProUGUI carNameText;
     public TextMeshProUGUI unlockCostText;
@@ -32,6 +33,8 @@ public class VehicleSelectionManager : MonoBehaviour
         rightButton.onClick.AddListener(NextCar);
         unlockButton.onClick.AddListener(UnlockCurrentCar);
         startButton.onClick.AddListener(StartGame);
+        stageButton.onClick.AddListener(GoToLevelSelect);
+
 
         DisplayCar();
     }
@@ -101,5 +104,12 @@ public class VehicleSelectionManager : MonoBehaviour
         GameManager.Instance.selectedCarIndex = currentCarIndex;
         GameManager.Instance.SaveGameData();
         GameManager.Instance.StartEndlessMode();
+    }
+
+    public void GoToLevelSelect()
+    {
+        GameManager.Instance.selectedCarIndex = currentCarIndex;
+        GameManager.Instance.SaveGameData();
+        GameManager.Instance.GoToLevelSelect();
     }
 }

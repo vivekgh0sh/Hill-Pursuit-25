@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 872835291637898176}
   - component: {fileID: 7266026601932176346}
   - component: {fileID: 7150504141123926109}
-  m_Layer: 10
+  m_Layer: 8
   m_Name: W_FR_Bartha_495
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 222045200306970071}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: -0.24874005, y: -0, z: -0, w: 0.96857035}
   m_LocalPosition: {x: 0.55, y: 0.125, z: 0.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -98,9 +98,11 @@ GameObject:
   - component: {fileID: 3749840646410760046}
   - component: {fileID: 6129071982788158951}
   - component: {fileID: 4890888010667086169}
+  - component: {fileID: 2008346986362596282}
   - component: {fileID: 3682211673085317016}
   - component: {fileID: 6199939734440870487}
-  m_Layer: 10
+  - component: {fileID: 9167360894988617522}
+  m_Layer: 8
   m_Name: 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -142,8 +144,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.3074453, y: 1.1029644, z: 2.3323345}
-  m_Center: {x: 0, y: 0.55590487, z: 0.0034802756}
+  m_Size: {x: 1.3074453, y: 1.1184982, z: 2.0786216}
+  m_Center: {x: 0, y: 0.5481383, z: -0.12337681}
 --- !u!54 &4890888010667086169
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -171,6 +173,24 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 114
   m_CollisionDetection: 0
+--- !u!114 &2008346986362596282
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1842186177362636945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05dff48ba58c6344996416acec622fa4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  carVisuals: {fileID: 2502097336425503108}
+  maxJumpPitch: 30
+  maxFallPitch: -25
+  velocityForMaxJumpPitch: 10
+  velocityForMaxFallPitch: -15
+  rotationSmoothTime: 0.1
 --- !u!114 &3682211673085317016
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -187,7 +207,7 @@ MonoBehaviour:
   boostSpeed: 25
   jumpForce: 8
   maxJumps: 2
-  jumpHoldCutoff: 0.5
+  jumpHoldCutoff: 1
   jumpCooldown: 1.5
   groundLayer:
     serializedVersion: 2
@@ -219,6 +239,18 @@ MonoBehaviour:
   - {fileID: 7425899732595060890}
   - {fileID: 8920717199626020627}
   rotationSpeed: 500
+--- !u!114 &9167360894988617522
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1842186177362636945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe984378369814d48b361f95927b17d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3758369889839869077
 GameObject:
   m_ObjectHideFlags: 0
@@ -230,7 +262,7 @@ GameObject:
   - component: {fileID: 845107774748932191}
   - component: {fileID: 5892873717874947717}
   - component: {fileID: 7827545592081697973}
-  m_Layer: 10
+  m_Layer: 8
   m_Name: W_FL_Bartha_495
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -245,7 +277,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3758369889839869077}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: -0.24874005, y: -0, z: -0, w: 0.96857035}
   m_LocalPosition: {x: -0.55, y: 0.125, z: 0.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -317,7 +349,7 @@ GameObject:
   - component: {fileID: 2502097336425503108}
   - component: {fileID: 799888564312542993}
   - component: {fileID: 3174836214229991243}
-  m_Layer: 10
+  m_Layer: 8
   m_Name: CarVisuals
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -332,7 +364,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4453113679243639465}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: -0.0035823688, y: -0, z: -0, w: 0.9999936}
   m_LocalPosition: {x: -0, y: 0.072, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -342,7 +374,7 @@ Transform:
   - {fileID: 7425899732595060890}
   - {fileID: 8920717199626020627}
   m_Father: {fileID: 3749840646410760046}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -0.411, y: 0, z: 0}
 --- !u!33 &799888564312542993
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -410,7 +442,7 @@ GameObject:
   - component: {fileID: 8920717199626020627}
   - component: {fileID: 1337388235320000944}
   - component: {fileID: 4057788271761933641}
-  m_Layer: 10
+  m_Layer: 8
   m_Name: W_RL_Bartha_495
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -425,7 +457,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4583401418936365323}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: -0.24874005, y: -0, z: -0, w: 0.96857035}
   m_LocalPosition: {x: -0.55, y: 0.125, z: -0.732}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -497,7 +529,7 @@ GameObject:
   - component: {fileID: 7425899732595060890}
   - component: {fileID: 1033944559993014000}
   - component: {fileID: 8110613306080635583}
-  m_Layer: 10
+  m_Layer: 8
   m_Name: W_RR_Bartha_495
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -512,7 +544,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8376998185201441870}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: -0.24874005, y: -0, z: -0, w: 0.96857035}
   m_LocalPosition: {x: 0.55, y: 0.125, z: -0.732}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
