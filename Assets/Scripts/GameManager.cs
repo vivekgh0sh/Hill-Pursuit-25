@@ -76,7 +76,6 @@ public class GameManager : MonoBehaviour
         currentState = GameState.LevelComplete;
         Time.timeScale = 0f;
 
-        // Unlock the next level if it exists
         if (currentLevelIndex + 1 > highestLevelUnlocked && currentLevelIndex + 1 < allLevelChunks.Count)
         {
             highestLevelUnlocked = currentLevelIndex + 1;
@@ -84,10 +83,30 @@ public class GameManager : MonoBehaviour
 
         totalCoins += coinsCollectedThisRun;
         SaveGameData();
-        // Here you would typically show a "Level Complete" UI screen
-        Debug.Log("Level Complete! Unlocked up to level: " + highestLevelUnlocked);
-        // For now, let's just go back to the level select screen
-        GoToLevelSelect();
+
+        // Find the UI controller and tell it to show the level complete screen
+        GameplayUIController uiController = FindFirstObjectByType<GameplayUIController>();
+        if (uiController != null)
+        {
+            uiController.ShowLevelCompleteScreen();
+        }
+    }
+
+    // Add this new method
+    public void LoadNextLevel()
+    {
+        int nextLevel = currentLevelIndex + 1;
+        // Check if there is a next level
+        if (nextLevel < allLevelChunks.Count)
+        {
+            StartLevel(nextLevel);
+        }
+        else
+        {
+            // If that was the last level, just go to the level select screen
+            Debug.Log("Last level completed!");
+            GoToLevelSelect();
+        }
     }
 
     public void SaveGameData() { PlayerPrefs.SetInt("TotalCoins", totalCoins); PlayerPrefs.SetInt("Highscore", highscore); PlayerPrefs.SetInt("SelectedCarIndex", selectedCarIndex); PlayerPrefs.SetInt("HighestLevelUnlocked", highestLevelUnlocked); PlayerPrefs.Save(); }
