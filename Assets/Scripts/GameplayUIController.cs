@@ -8,6 +8,7 @@ public class GameplayUIController : MonoBehaviour
     [Header("UI Panels")]
     public GameObject gameplayPanel;
     public GameObject gameOverPanel;
+    public GameObject levelCompletePanel;
 
     [Header("Gameplay UI")]
     public TextMeshProUGUI gameplayDistanceText;
@@ -21,20 +22,29 @@ public class GameplayUIController : MonoBehaviour
     public Button restartButton;
     public Button menuButton;
 
+    [Header("Level Complete UI")]
+    public TextMeshProUGUI lc_coinsCollectedText;
+    public TextMeshProUGUI lc_totalCoinsText;
+    public Button nextLevelButton;
+    public Button menuButtonLevelComplete;
+
     void Start()
     {
         gameOverPanel.SetActive(false);
+        levelCompletePanel.SetActive(false);
         gameplayPanel.SetActive(true);
 
         restartButton.onClick.AddListener(OnRestartButtonPressed);
         menuButton.onClick.AddListener(OnMenuButtonPressed);
+        nextLevelButton.onClick.AddListener(OnNextLevelButtonPressed);
+        menuButtonLevelComplete.onClick.AddListener(OnMenuButtonPressed);
     }
 
     void Update()
     {
         if (GameManager.Instance != null && GameManager.Instance.currentState == GameManager.GameState.Playing)
         {
-            gameplayDistanceText.text = GameManager.Instance.GetCurrentDistance().ToString();
+            gameplayDistanceText.text = "Distance: " + GameManager.Instance.GetCurrentDistance().ToString();
             gameplayCoinText.text = "Coins: " + GameManager.Instance.GetRunCoins().ToString();
         }
     }
@@ -53,6 +63,18 @@ public class GameplayUIController : MonoBehaviour
         }
     }
 
+    public void ShowLevelCompleteScreen()
+    {
+        gameplayPanel.SetActive(false);
+        levelCompletePanel.SetActive(true);
+
+        if (GameManager.Instance != null)
+        {
+            lc_coinsCollectedText.text = "Coins Collected: " + GameManager.Instance.GetRunCoins().ToString();
+            lc_totalCoinsText.text = "Total Coins: " + GameManager.Instance.totalCoins.ToString();
+        }
+    }
+
     private void OnRestartButtonPressed()
     {
         if (GameManager.Instance != null)
@@ -66,6 +88,14 @@ public class GameplayUIController : MonoBehaviour
         if (GameManager.Instance != null)
         {
             GameManager.Instance.GoToMenu();
+        }
+    }
+
+    private void OnNextLevelButtonPressed()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.LoadNextLevel();
         }
     }
 }

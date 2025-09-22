@@ -1669,6 +1669,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameplayPanel: {fileID: 472715993}
   gameOverPanel: {fileID: 3329589760263543885}
+  levelCompletePanel: {fileID: 3329589760263543885}
   gameplayDistanceText: {fileID: 567974130}
   gameplayCoinText: {fileID: 1568756058}
   finalDistanceText: {fileID: 7448020192334266233}
@@ -1677,6 +1678,10 @@ MonoBehaviour:
   totalCoinsText: {fileID: 2617244082432540892}
   restartButton: {fileID: 5809449510842781423}
   menuButton: {fileID: 2269625122821174371}
+  lc_coinsCollectedText: {fileID: 170132565909185155}
+  lc_totalCoinsText: {fileID: 2617244082432540892}
+  nextLevelButton: {fileID: 3374725408605938691}
+  menuButtonLevelComplete: {fileID: 2269625122821174371}
 --- !u!114 &170132565909185155
 MonoBehaviour:
   m_ObjectHideFlags: 0

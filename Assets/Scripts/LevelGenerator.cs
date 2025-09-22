@@ -3,9 +3,8 @@ using System.Collections.Generic;
 
 public class LevelGenerator : MonoBehaviour
 {
-    // We no longer assign the player in the Inspector. It will be found automatically.
+    // --- (All your public variables are the same) ---
     private Transform player;
-
     public GameObject[] levelChunkPrefabs;
     public int initialChunkCount = 3;
     public float generationLookahead = 100f;
@@ -13,64 +12,73 @@ public class LevelGenerator : MonoBehaviour
     private List<GameObject> spawnedChunks = new List<GameObject>();
     private Vector3 lastEndPoint;
 
-    // When this object is enabled, it subscribes to the event.
-    void OnEnable()
-    {
-        PlayerSpawner.OnPlayerSpawned += HandlePlayerSpawned;
-    }
+    void OnEnable() { PlayerSpawner.OnPlayerSpawned += HandlePlayerSpawned; }
+    void OnDisable() { PlayerSpawner.OnPlayerSpawned -= HandlePlayerSpawned; }
 
-    // When this object is disabled, it unsubscribes to prevent errors.
-    void OnDisable()
-    {
-        PlayerSpawner.OnPlayerSpawned -= HandlePlayerSpawned;
-    }
-
-    // This method is called by the event when the player is spawned.
-    private void HandlePlayerSpawned(Transform playerTransform)
-    {
-        player = playerTransform;
-    }
+    private void HandlePlayerSpawned(Transform playerTransform) { player = playerTransform; }
 
     void Start()
     {
-        GameObject firstChunk = Instantiate(levelChunkPrefabs[0], Vector3.zero, Quaternion.identity, this.transform);
-        spawnedChunks.Add(firstChunk);
+        // Spawn the very first chunk using our new, safe method.
+        SpawnChunkForEndless(true);
 
-        PlatformData firstData = firstChunk.GetComponent<PlatformData>();
-        lastEndPoint = firstData.endPoint.position;
-
+        // Spawn the rest of the initial chunks.
         for (int i = 0; i < initialChunkCount - 1; i++)
         {
-            GenerateChunk();
+            SpawnChunkForEndless(false);
         }
     }
 
     void Update()
     {
-        // If we don't have a player reference yet, don't do anything.
         if (player == null) return;
 
         if (player.position.z > lastEndPoint.z - generationLookahead)
         {
-            GenerateChunk();
+            // Spawn subsequent chunks using the same safe method.
+            SpawnChunkForEndless(false);
         }
         CleanUpChunks();
     }
 
-    // ... (GenerateChunk and CleanUpChunks methods are unchanged) ...
-    #region Unchanged Code
-    void GenerateChunk()
+    // --- THIS IS THE NEW HELPER METHOD ---
+    // This is now the ONLY way chunks are created in endless mode.
+    private void SpawnChunkForEndless(bool isFirstChunk)
     {
-        GameObject prefabToSpawn = levelChunkPrefabs[Random.Range(0, levelChunkPrefabs.Length)];
-        GameObject newChunk = Instantiate(prefabToSpawn, Vector3.zero, Quaternion.identity, this.transform);
+        GameObject prefabToSpawn = isFirstChunk ? levelChunkPrefabs[0] : levelChunkPrefabs[Random.Range(0, levelChunkPrefabs.Length)];
+
+        // Use Vector3.zero for the first chunk, otherwise calculate position.
+        Vector3 spawnPos = isFirstChunk ? Vector3.zero : new Vector3(0, 0, 10000); // Temp position
+        GameObject newChunk = Instantiate(prefabToSpawn, spawnPos, Quaternion.identity, this.transform);
+
+        // CRITICAL: Immediately find and destroy any finish trigger.
+        LevelFinishTrigger finishTrigger = newChunk.GetComponentInChildren<LevelFinishTrigger>();
+        if (finishTrigger != null)
+        {
+            Destroy(finishTrigger.gameObject);
+        }
+
+        // Now, correctly position the chunk.
         PlatformData data = newChunk.GetComponent<PlatformData>();
         Vector3 startPoint = data.startPoint.position;
         Vector3 endPoint = data.endPoint.position;
-        Vector3 moveVector = lastEndPoint - startPoint;
-        newChunk.transform.position += moveVector;
-        lastEndPoint = endPoint + moveVector;
+
+        if (!isFirstChunk)
+        {
+            Vector3 moveVector = lastEndPoint - startPoint;
+            newChunk.transform.position += moveVector;
+            // Update the end point based on the moved position
+            lastEndPoint = endPoint + moveVector;
+        }
+        else
+        {
+            // For the first chunk, just record its natural end point.
+            lastEndPoint = endPoint;
+        }
+
         spawnedChunks.Add(newChunk);
     }
+
     void CleanUpChunks()
     {
         for (int i = spawnedChunks.Count - 1; i >= 0; i--)
@@ -80,5 +88,4 @@ public class LevelGenerator : MonoBehaviour
             if (player.position.z - chunkPositionZ > cleanupDistance) { Destroy(spawnedChunks[i]); spawnedChunks.RemoveAt(i); }
         }
     }
-    #endregion
 }
