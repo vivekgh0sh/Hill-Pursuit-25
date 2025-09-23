@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2482253537291878691}
   - component: {fileID: 8772117460455608796}
   - component: {fileID: 5743504727093073612}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 5_platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -452,8 +452,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 8, z: 7.3309174}
-  m_Center: {x: 0, y: -3.5, z: 30.149097}
+  m_Size: {x: 4.080918, y: 8, z: 7.3309174}
+  m_Center: {x: -0.08107686, y: -3.5, z: 30.149097}
 --- !u!65 &8772117460455608796
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -473,8 +473,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 8, z: 8.155045}
-  m_Center: {x: 0, y: -3.5, z: -21.472645}
+  m_Size: {x: 4.243071, y: 8, z: 8.155045}
+  m_Center: {x: -0.08107686, y: -3.5, z: -21.472645}
 --- !u!65 &5743504727093073612
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -494,8 +494,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 3, z: 44}
-  m_Center: {x: 0, y: -6, z: 4.5}
+  m_Size: {x: 4.0809174, y: 3, z: 44}
+  m_Center: {x: -0.08107698, y: -6, z: 4.5}
 --- !u!1001 &22153571263642688
 PrefabInstance:
   m_ObjectHideFlags: 0

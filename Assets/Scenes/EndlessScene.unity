@@ -287,6 +287,12 @@ MonoBehaviour:
   levelChunkPrefabs:
   - {fileID: 8227274187712278100, guid: 1b0615a198e243645b3fc97e3e402edf, type: 3}
   - {fileID: 8776765474540881029, guid: 24e01c5ee334efe4bb65315bd0294270, type: 3}
+  - {fileID: 3328096634759724267, guid: 5a10b7b5255befd4e9e6b2879ae506c1, type: 3}
+  - {fileID: 6693354733215022999, guid: 92a8fc3901407b6419ef1c7a42d0e345, type: 3}
+  - {fileID: 8248651112582163350, guid: b090d30468cf2ae46be758cd91b37b0a, type: 3}
+  - {fileID: 2942390366347232765, guid: 13fe04c5391a82843a7f6d3c82a035d9, type: 3}
+  - {fileID: 9214716641985321575, guid: ef03162382cadcb4387f7311e5b063ed, type: 3}
+  - {fileID: 7848756668619361554, guid: e889a2a6b9631ea4585835bc9da54ee4, type: 3}
   initialChunkCount: 3
   generationLookahead: 40
   cleanupDistance: 500
