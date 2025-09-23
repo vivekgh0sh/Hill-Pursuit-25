@@ -8221,7 +8221,6 @@ GameObject:
   - component: {fileID: 6902622995134334247}
   - component: {fileID: 2884373500676355662}
   - component: {fileID: 3767798150496081447}
-  - component: {fileID: -8647117559989810935}
   - component: {fileID: 1960693868491181157}
   m_Layer: 6
   m_Name: 2_Block
@@ -8320,20 +8319,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &-8647117559989810935
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1800732573274593308}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 460fc20e721a7b949acf6ca3fccaa0a9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  startPoint: {fileID: 4304529846311909565}
-  endPoint: {fileID: 2320248037133131248}
 --- !u!65 &1960693868491181157
 BoxCollider:
   m_ObjectHideFlags: 0
