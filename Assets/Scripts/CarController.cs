@@ -28,6 +28,10 @@ public class CarController : MonoBehaviour
     public float deathDistance = 20f;
     private float lastGroundedY;
 
+    [Header("JumpFX")]
+    public GameObject jumpFx;
+    
+
     private Rigidbody rb;
     private bool isGrounded;
     private bool isBoosting = false;
@@ -134,7 +138,26 @@ public class CarController : MonoBehaviour
 
     private void RequestJump() { if (jumpsLeft > 0 && !isJumpOnCooldown) { jumpRequested = true; } }
     private void EndJump() { if (isJumping && rb.linearVelocity.y > 0) { rb.linearVelocity = new Vector3(rb.linearVelocity.x, rb.linearVelocity.y * jumpHoldCutoff, rb.linearVelocity.z); } isJumping = false; }
-    void Jump() { rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z); rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse); jumpsLeft--; isJumping = true; if (jumpsLeft == 0) { StartCoroutine(JumpCooldownCoroutine()); } }
+    void Jump() {
+
+        if (jumpFx != null)
+        {
+            foreach (Transform point in groundCheckPoints)
+            {
+                Instantiate(jumpFx, point.position, Quaternion.identity);
+            }
+        }
+
+        rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
+        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        jumpsLeft--; 
+        isJumping = true;
+        if (jumpsLeft == 0) 
+
+        { 
+            StartCoroutine(JumpCooldownCoroutine()); 
+        }
+    }
     IEnumerator JumpCooldownCoroutine() { isJumpOnCooldown = true; yield return new WaitForSeconds(jumpCooldown); isJumpOnCooldown = false; }
     void Boost() { if (canBoost) { StartCoroutine(BoostCoroutine()); } }
     IEnumerator BoostCoroutine() { canBoost = false; isBoosting = true; yield return new WaitForSeconds(boostDuration); isBoosting = false; yield return new WaitForSeconds(boostCooldown); canBoost = true; }
@@ -174,5 +197,9 @@ public class CarController : MonoBehaviour
     public bool IsGrounded()
     {
         return isGrounded;
+    }
+    public bool IsBoosting()
+    {
+        return isBoosting;
     }
 }
