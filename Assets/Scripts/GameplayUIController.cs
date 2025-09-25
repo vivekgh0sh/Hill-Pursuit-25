@@ -44,8 +44,9 @@ public class GameplayUIController : MonoBehaviour
     {
         if (GameManager.Instance != null && GameManager.Instance.currentState == GameManager.GameState.Playing)
         {
-            gameplayDistanceText.text = "Distance: " + GameManager.Instance.GetCurrentDistance().ToString();
-            gameplayCoinText.text = "Coins: " + GameManager.Instance.GetRunCoins().ToString();
+            gameplayDistanceText.text =GameManager.Instance.GetCurrentDistance().ToString() + "m";
+            gameplayDistanceText.text =GameManager.Instance.GetCurrentDistance().ToString() + "m";
+            gameplayCoinText.text = GameManager.Instance.GetRunCoins().ToString();
         }
     }
 
