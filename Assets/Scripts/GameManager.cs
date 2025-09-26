@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
-    public enum GameState { MainMenu, Playing, LevelComplete, GameOver }
+    public enum GameState { MainMenu, Playing, Paused, LevelComplete, GameOver }
     public GameState currentState;
 
     [Header("Player Score")]
@@ -25,7 +25,21 @@ public class GameManager : MonoBehaviour
     public int highestLevelUnlocked = 0; // Level 0 is unlocked by default
     private int currentLevelIndex = -1;
 
-    void Awake() { if (Instance == null) { Instance = this; DontDestroyOnLoad(gameObject); LoadGameData(); } else { Destroy(gameObject); } }
+    void Awake()
+    {
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+                Application.targetFrameRate = 120;
+                QualitySettings.vSyncCount = 0;
+                LoadGameData();
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+    }
     void OnEnable() { SceneManager.sceneLoaded += OnSceneLoaded; }
     void OnDisable() { SceneManager.sceneLoaded -= OnSceneLoaded; }
 
@@ -37,8 +51,10 @@ public class GameManager : MonoBehaviour
             Time.timeScale = 1f;
             coinsCollectedThisRun = 0;
             distanceTraveled = 0f;
+
         }
-        else { currentState = GameState.MainMenu; }
+        else { currentState = GameState.MainMenu;
+        }
     }
 
     void Update() { if (currentState == GameState.Playing && playerTransform != null) { distanceTraveled = playerTransform.position.z - startingZPosition; } }
@@ -46,8 +62,32 @@ public class GameManager : MonoBehaviour
     public void CollectCoin() { if (currentState != GameState.Playing) return; coinsCollectedThisRun++; }
     public int GetCurrentDistance() { return Mathf.Max(0, Mathf.FloorToInt(distanceTraveled)); }
     public int GetRunCoins() { return coinsCollectedThisRun; }
-    public void EndGame() { if (currentState != GameState.Playing) return; currentState = GameState.GameOver; Time.timeScale = 0f; int finalDistance = GetCurrentDistance(); if (finalDistance > highscore) { highscore = finalDistance; } totalCoins += coinsCollectedThisRun; SaveGameData(); GameplayUIController uiController = FindFirstObjectByType<GameplayUIController>(); if (uiController != null) { uiController.ShowGameOverScreen(); } }
-    public void GoToMenu() { Time.timeScale = 1f; SceneManager.LoadScene("VehicleSelectionUI"); }
+    public void EndGame()
+    {
+        if (currentState != GameState.Playing) return;
+        currentState = GameState.GameOver;
+        Time.timeScale = 0f;
+        AudioManager.Instance.PlaySFX("GameOver");
+
+        int finalDistance = GetCurrentDistance();
+        if (finalDistance > highscore)
+        {
+            highscore = finalDistance;
+        }
+        totalCoins += coinsCollectedThisRun;
+        SaveGameData();
+
+        GameplayUIController uiController = FindFirstObjectByType<GameplayUIController>();
+        if (uiController != null)
+        {
+            // --- THIS IS THE CHANGE ---
+            // We pass the final scores directly to the UI.
+            uiController.ShowGameOverScreen(finalDistance, coinsCollectedThisRun, highscore, totalCoins);
+        }
+    }
+    public void GoToMenu() {
+
+        Time.timeScale = 1f; SceneManager.LoadScene("VehicleSelectionUI"); }
     public void GoToLevelSelect() { Time.timeScale = 1f; SceneManager.LoadScene("LevelSelectUI"); }
     public void StartEndlessMode() { Time.timeScale = 1f; SceneManager.LoadScene("EndlessScene"); }
 
@@ -75,6 +115,7 @@ public class GameManager : MonoBehaviour
         if (currentState != GameState.Playing) return;
         currentState = GameState.LevelComplete;
         Time.timeScale = 0f;
+        AudioManager.Instance.PlaySFX("LevelComplete");
 
         if (currentLevelIndex + 1 > highestLevelUnlocked && currentLevelIndex + 1 < allLevelChunks.Count)
         {
@@ -103,12 +144,23 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            // If that was the last level, just go to the level select screen
-            Debug.Log("Last level completed!");
             GoToLevelSelect();
         }
     }
+    public void PauseGame()
+    {
+        if (currentState != GameState.Playing) return;
+        currentState = GameState.Paused;    
+        Time.timeScale = 0f;
+    }
 
+
+    public void ResumeGame()
+    {
+        if (currentState != GameState.Paused) return;  
+        currentState = GameState.Playing;
+        Time.timeScale = 1f;
+    }
     public void SaveGameData() { PlayerPrefs.SetInt("TotalCoins", totalCoins); PlayerPrefs.SetInt("Highscore", highscore); PlayerPrefs.SetInt("SelectedCarIndex", selectedCarIndex); PlayerPrefs.SetInt("HighestLevelUnlocked", highestLevelUnlocked); PlayerPrefs.Save(); }
     public void LoadGameData() { totalCoins = PlayerPrefs.GetInt("TotalCoins", 0); highscore = PlayerPrefs.GetInt("Highscore", 0); selectedCarIndex = PlayerPrefs.GetInt("SelectedCarIndex", 0); highestLevelUnlocked = PlayerPrefs.GetInt("HighestLevelUnlocked", 0); }
     public bool CanAfford(int cost) { return totalCoins >= cost; }

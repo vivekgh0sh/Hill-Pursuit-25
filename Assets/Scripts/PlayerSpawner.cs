@@ -5,6 +5,14 @@ public class PlayerSpawner : MonoBehaviour
 {
     public static event Action<Transform> OnPlayerSpawned;
 
+    // --- THIS IS THE NEW HELPER METHOD ---
+    // Any script can call this static method to safely invoke the event.
+    // The responsibility of firing the event stays within this class.
+    public static void InvokeOnPlayerSpawned(Transform playerTransform)
+    {
+        OnPlayerSpawned?.Invoke(playerTransform);
+    }
+
     void Start()
     {
         if (GameManager.Instance == null)
@@ -31,11 +39,9 @@ public class PlayerSpawner : MonoBehaviour
         // Spawn the car prefab and get a reference to the new instance
         GameObject playerInstance = Instantiate(carToSpawnPrefab, transform.position, transform.rotation);
 
-        // Announce that the player has been spawned, and pass along its Transform.
-        if (OnPlayerSpawned != null)
-        {
-            OnPlayerSpawned(playerInstance.transform);
-        }
+        // --- THIS IS THE CHANGE ---
+        // Announce that the player has been spawned using our new public method.
+        InvokeOnPlayerSpawned(playerInstance.transform);
 
         Destroy(gameObject);
     }

@@ -206,7 +206,6 @@ GameObject:
   - component: {fileID: 278523623}
   - component: {fileID: 278523622}
   - component: {fileID: 278523621}
-  - component: {fileID: 278523625}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -302,31 +301,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &278523625
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 278523620}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a3212006f3d566541be9423466c2e9c4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LevelSelectUI
-  levelButtonPrefab: {fileID: 4362927448124389502, guid: afe06b8ba217f6e46b59710dc626e680, type: 3}
-  buttonContainer: {fileID: 476137198}
-  backButton: {fileID: 296306685}
-  background: {fileID: 651121497}
-  nextPageButton: {fileID: 388276447}
-  prevPageButton: {fileID: 823592472}
-  pageText: {fileID: 1087212417}
-  levelsPerPage: 25
-  phases:
-  - {fileID: 11400000, guid: dbb86ebceeac5b241b38a8661cc64249, type: 2}
-  - {fileID: 11400000, guid: 1e93d17923e464b41ade7c6c87901a21, type: 2}
-  - {fileID: 11400000, guid: 2e05160dc28df6d4090b53f75bf0e441, type: 2}
-  - {fileID: 11400000, guid: 38508dc0befbeef478692ef9969e8fe7, type: 2}
 --- !u!1 &296306683
 GameObject:
   m_ObjectHideFlags: 0
@@ -339,6 +313,7 @@ GameObject:
   - component: {fileID: 296306687}
   - component: {fileID: 296306686}
   - component: {fileID: 296306685}
+  - component: {fileID: 296306688}
   m_Layer: 5
   m_Name: Back
   m_TagString: Untagged
@@ -447,6 +422,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 296306683}
   m_CullTransparentMesh: 1
+--- !u!114 &296306688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 296306683}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06bfba769e66fae45ac2e9baeb145e05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &326484806
 GameObject:
   m_ObjectHideFlags: 0
@@ -585,6 +572,7 @@ GameObject:
   - component: {fileID: 388276449}
   - component: {fileID: 388276448}
   - component: {fileID: 388276447}
+  - component: {fileID: 388276450}
   m_Layer: 5
   m_Name: NextPageButton
   m_TagString: Untagged
@@ -693,6 +681,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 388276445}
   m_CullTransparentMesh: 1
+--- !u!114 &388276450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 388276445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06bfba769e66fae45ac2e9baeb145e05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &476137197
 GameObject:
   m_ObjectHideFlags: 0
@@ -726,7 +726,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -3}
+  m_AnchoredPosition: {x: 0, y: -31}
   m_SizeDelta: {x: 0, y: -87.22234}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &476137199
@@ -750,9 +750,9 @@ MonoBehaviour:
   m_StartCorner: 0
   m_StartAxis: 0
   m_CellSize: {x: 50, y: 50}
-  m_Spacing: {x: 20, y: 20}
+  m_Spacing: {x: 40, y: 10}
   m_Constraint: 1
-  m_ConstraintCount: 4
+  m_ConstraintCount: 5
 --- !u!1 &651121495
 GameObject:
   m_ObjectHideFlags: 0
@@ -840,6 +840,7 @@ GameObject:
   - component: {fileID: 823592474}
   - component: {fileID: 823592473}
   - component: {fileID: 823592472}
+  - component: {fileID: 823592475}
   m_Layer: 5
   m_Name: PrevPageButton
   m_TagString: Untagged
@@ -948,6 +949,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 823592470}
   m_CullTransparentMesh: 1
+--- !u!114 &823592475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 823592470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06bfba769e66fae45ac2e9baeb145e05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &841946311
 GameObject:
   m_ObjectHideFlags: 0
@@ -1117,6 +1130,16 @@ MonoBehaviour:
   levelButtonPrefab: {fileID: 4477560464024031059, guid: 1752daf7f28ece04a8af27a0c734e074, type: 3}
   buttonContainer: {fileID: 476137198}
   backButton: {fileID: 296306685}
+  background: {fileID: 651121497}
+  nextPageButton: {fileID: 388276447}
+  prevPageButton: {fileID: 823592472}
+  pageTitleText: {fileID: 1087212417}
+  levelsPerPage: 25
+  phases:
+  - {fileID: 11400000, guid: 4b30bbb0c201a164481fa666c382ea0a, type: 2}
+  - {fileID: 11400000, guid: 4c9918806211e0b498b02ee59ede1dc6, type: 2}
+  - {fileID: 11400000, guid: f88ec460ffd92b4448182ad3e66a0e59, type: 2}
+  - {fileID: 11400000, guid: 32a63f913be5aa24eacf0acb4a508bdc, type: 2}
 --- !u!4 &845812624
 Transform:
   m_ObjectHideFlags: 0
