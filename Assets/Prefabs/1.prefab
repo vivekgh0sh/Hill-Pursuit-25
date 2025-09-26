@@ -211,6 +211,7 @@ MonoBehaviour:
   maxJumps: 2
   jumpHoldCutoff: 1
   jumpCooldown: 1.5
+  peakVelocityThreshold: 0.5
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -222,8 +223,8 @@ MonoBehaviour:
   groundCheckDistance: 1.1
   boostDuration: 0.5
   boostCooldown: 2
-  deathDistance: 20
-  jumpFx: {fileID: 4922791545982394403, guid: 99f5c57ad8cf3f74f8496883982d0df9, type: 3}
+  deathDistance: 30
+  jumpParticlesPrefab: {fileID: 4922791545982394403, guid: 99f5c57ad8cf3f74f8496883982d0df9, type: 3}
 --- !u!114 &6199939734440870487
 MonoBehaviour:
   m_ObjectHideFlags: 0
